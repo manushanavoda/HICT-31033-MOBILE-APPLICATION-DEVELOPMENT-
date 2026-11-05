@@ -9,5 +9,6 @@
     <string name="hello_user">Hello, %1$s!</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Logout</string>
+    <string name="visit_website">Visit Website</string>
 
 </resources>
