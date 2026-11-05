@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
 
             intent.putExtra("USER_NAME", userName);
+            intent.putExtra("USER_AGE", 20);
+
+            startActivity(intent);
 
             startActivity(intent);
         });

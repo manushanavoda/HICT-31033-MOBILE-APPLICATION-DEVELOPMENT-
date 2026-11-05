@@ -42,6 +42,14 @@ public class DashboardActivity extends AppCompatActivity {
         TextView txtUserName = findViewById(R.id.txtUserName);
         txtUserName.setText(getString(R.string.hello_user, userName));
 
+        int age = getIntent().getIntExtra("USER_AGE", 0);
+
+        Toast.makeText(
+                this,
+                "Your age is " + age,
+                Toast.LENGTH_SHORT
+        ).show();
+
         // Find RecyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
 
@@ -63,6 +71,9 @@ public class DashboardActivity extends AppCompatActivity {
         items.add("Adapter");
         items.add("RecyclerView");
         items.add("Menu");
+        items.add("Button");
+        items.add("TextView");
+        items.add("EditText");
 
 // Create Adapter
         MyAdapter myAdapter = new MyAdapter(items);
@@ -74,12 +85,11 @@ public class DashboardActivity extends AppCompatActivity {
 
         btnWebsite.setOnClickListener(v -> {
 
-            Intent browserIntent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://www.google.com")
-            );
+            Intent dialIntent = new Intent(Intent.ACTION_DIAL);
 
-            startActivity(browserIntent);
+            dialIntent.setData(Uri.parse("tel:0771442397"));
+
+            startActivity(dialIntent);
         });
 
     }
@@ -117,6 +127,16 @@ public class DashboardActivity extends AppCompatActivity {
 
                     .setNegativeButton("No", null)
 
+                    .show();
+
+            return true;
+        }
+        else if (id == R.id.action_about) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("About")
+                    .setMessage("This is my Lab 03 Android Application.")
+                    .setPositiveButton("OK", null)
                     .show();
 
             return true;

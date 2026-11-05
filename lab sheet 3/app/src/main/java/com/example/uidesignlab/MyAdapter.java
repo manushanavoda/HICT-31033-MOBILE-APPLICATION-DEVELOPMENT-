@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +45,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        holder.txtItem.setText(items.get(position));
+        String item = items.get(position);
+
+        holder.txtItem.setText(item);
+
+        holder.itemView.setOnClickListener(v -> {
+            Toast.makeText(
+                    v.getContext(),
+                    item,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
     }
 
     @Override
