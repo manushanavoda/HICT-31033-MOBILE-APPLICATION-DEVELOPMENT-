@@ -10,6 +10,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -32,6 +37,34 @@ public class DashboardActivity extends AppCompatActivity {
         String userName = getIntent().getStringExtra("USER_NAME");
         TextView txtUserName = findViewById(R.id.txtUserName);
         txtUserName.setText(getString(R.string.hello_user, userName));
+
+        // Find RecyclerView
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+
+// Set vertical layout
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+// Create data list
+        List<String> items = new ArrayList<>();
+
+        items.add("Activity");
+        items.add("Service");
+        items.add("Broadcast Receiver");
+        items.add("Content Provider");
+        items.add("Intent");
+        items.add("Fragment");
+        items.add("View");
+        items.add("Layout");
+        items.add("Manifest");
+        items.add("Adapter");
+        items.add("RecyclerView");
+        items.add("Menu");
+
+// Create Adapter
+        MyAdapter myAdapter = new MyAdapter(items);
+
+// Connect Adapter to RecyclerView
+        recyclerView.setAdapter(myAdapter);
 
 
     }
