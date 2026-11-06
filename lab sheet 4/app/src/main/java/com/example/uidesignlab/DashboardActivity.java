@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +95,27 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(dialIntent);
         });
 
+        // Add DetailFragment at runtime (only the first time)
+
+        if (savedInstanceState == null) {
+
+            FragmentManager fragmentManager =
+                    getSupportFragmentManager();
+
+            FragmentTransaction transaction =
+                    fragmentManager.beginTransaction();
+
+            DetailFragment detailFrag =
+                    new DetailFragment();
+
+            transaction.add(
+                    R.id.dynamic_fragment_container,
+                    detailFrag
+            );
+
+            transaction.commit();
+        }
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,6 +165,33 @@ public class DashboardActivity extends AppCompatActivity {
 
             return true;
         }
+     else if (id == R.id.action_swap) {
+
+        Fragment current = getSupportFragmentManager()
+                .findFragmentById(R.id.dynamic_fragment_container);
+
+        FragmentTransaction transaction =
+                getSupportFragmentManager().beginTransaction();
+
+        if (current instanceof DetailFragment) {
+
+            transaction.replace(
+                    R.id.dynamic_fragment_container,
+                    new InfoFragment()
+            );
+
+        } else {
+
+            transaction.replace(
+                    R.id.dynamic_fragment_container,
+                    new DetailFragment()
+            );
+        }
+
+        transaction.commit();
+
+        return true;
+    }
 
         return super.onOptionsItemSelected(item);
     }

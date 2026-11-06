@@ -13,5 +13,9 @@
     <string name="menu_about">About</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="detail_default">Detail area: no message yet</string>
+    <string name="info_text">This is the Info Fragment. It replaced the Detail Fragment.</string>
+
+    <string name="menu_swap">Swap Fragment</string>
 
 </resources>

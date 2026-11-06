@@ -17,4 +17,9 @@
         android:title="@string/menu_about"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_swap"
+        android:title="@string/menu_swap"
+        app:showAsAction="never" />
+
 </menu>
