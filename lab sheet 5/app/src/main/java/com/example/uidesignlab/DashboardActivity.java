@@ -174,6 +174,7 @@ public class DashboardActivity extends AppCompatActivity
 
                     .setPositiveButton("Yes", (dialog, which) -> {
 
+                        // Clear Remember Me data
                         getSharedPreferences(
                                 MainActivity.PREFS_NAME,
                                 MODE_PRIVATE
@@ -181,7 +182,16 @@ public class DashboardActivity extends AppCompatActivity
                                 .edit()
                                 .clear()
                                 .apply();
-                                finish();
+
+                        // Reset Dashboard visit counter
+                        getPreferences(MODE_PRIVATE)
+                                .edit()
+                                .remove("visit_count")
+                                .apply();
+
+                        // Close Dashboard
+                        finish();
+
                     })
 
                     .setNegativeButton("No", null)

@@ -53,9 +53,15 @@ public class MainActivity extends AppCompatActivity {
         chkRemember.setChecked(remember);
 
         if (remember) {
-            editUsername.setText(
-                    prefs.getString(KEY_USERNAME, "")
-            );
+
+            String savedName = prefs.getString(KEY_USERNAME, "");
+
+            editUsername.setText(savedName);
+
+            Toast.makeText(this,
+                    "Welcome back, " + savedName + "!",
+                    Toast.LENGTH_SHORT).show();
+
         }
         btnSave.setBackgroundColor(COLOR_NORMAL);
 
@@ -102,7 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean(KEY_REMEMBER, false);
             }
 
-            editor.apply();
+            boolean commitResult = editor.commit();
+
+            Log.d("StorageLab",
+                    "UserPrefs commit result: " + result);
 
             Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
 

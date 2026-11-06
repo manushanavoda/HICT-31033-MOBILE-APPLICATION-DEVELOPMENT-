@@ -30,6 +30,7 @@
     <string name="file_info">File: %1$s (%2$d bytes)</string>
     <string name="file_none">No note file yet</string>
     <string name="menu_notes">My Notes</string>
+    <string name="append_note">Append</string>
 
 
 </resources>

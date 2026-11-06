@@ -1,3 +1,4 @@
+
 package com.example.uidesignlab;
 
 import android.os.Bundle;
@@ -37,10 +38,13 @@ public class NotesActivity extends AppCompatActivity {
         Button btnSaveNote = findViewById(R.id.btnSaveNote);
         Button btnLoadNote = findViewById(R.id.btnLoadNote);
         Button btnDeleteNote = findViewById(R.id.btnDeleteNote);
+        Button btnAppendNote = findViewById(R.id.btnAppendNote);
 
+        // Save Button
         btnSaveNote.setOnClickListener(v ->
                 saveNote(editNote.getText().toString()));
 
+        // Load Button
         btnLoadNote.setOnClickListener(v -> {
             String saved = loadNote();
 
@@ -54,6 +58,7 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
+        // Delete Button
         btnDeleteNote.setOnClickListener(v -> {
             boolean deleted = deleteFile(FILE_NAME);
 
@@ -66,10 +71,20 @@ public class NotesActivity extends AppCompatActivity {
             updateFileInfo();
         });
 
+        // Append Button
+        btnAppendNote.setOnClickListener(v ->
+                appendNote(editNote.getText().toString()));
+
         updateFileInfo();
+        String savedNote = loadNote();
+
+        if (savedNote != null) {
+            editNote.setText(savedNote);
+        }
+
     }
 
-    // Write the text to a private file
+    // Save note
     private void saveNote(String text) {
 
         try (FileOutputStream fos =
@@ -91,7 +106,41 @@ public class NotesActivity extends AppCompatActivity {
         updateFileInfo();
     }
 
-    // Read the file line by line
+    // Append note - Question 3
+    private void appendNote(String text) {
+
+        if (text.trim().isEmpty()) {
+            Toast.makeText(this, "Enter some text",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        File file = getFileStreamPath(FILE_NAME);
+
+        try (FileOutputStream fos =
+                     openFileOutput(FILE_NAME, MODE_APPEND)) {
+
+            if (file.exists() && file.length() > 0) {
+                fos.write("\n".getBytes(StandardCharsets.UTF_8));
+            }
+
+            fos.write(text.getBytes(StandardCharsets.UTF_8));
+
+            Toast.makeText(this, "Note appended",
+                    Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+
+            Log.e(TAG, "Could not append the note", e);
+
+            Toast.makeText(this, "Append failed",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        updateFileInfo();
+    }
+
+    // Load note
     private String loadNote() {
 
         StringBuilder text = new StringBuilder();
@@ -121,6 +170,7 @@ public class NotesActivity extends AppCompatActivity {
         return text.toString();
     }
 
+    // Update file information
     private void updateFileInfo() {
 
         File file = getFileStreamPath(FILE_NAME);
