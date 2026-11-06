@@ -53,6 +53,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
+    <CheckBox
+        android:id="@+id/chkRemember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/remember_me"
+        app:layout_constraintTop_toBottomOf="@id/editUsername"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <Button
         android:id="@+id/btnSave"
         android:layout_width="0dp"

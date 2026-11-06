@@ -19,5 +19,9 @@
     <string name="menu_swap">Swap Fragment</string>
     <string name="send_to_detail">Send to Detail</string>
     <string name="clear_detail">Clear</string>
+    <string name="remember_me">Remember me</string>
+    <string name="visit_count">You opened the Dashboard %1$d times</string>
+
+
 
 </resources>

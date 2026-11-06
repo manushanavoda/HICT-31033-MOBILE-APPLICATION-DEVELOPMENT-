@@ -15,10 +15,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import android.content.SharedPreferences;
+import android.widget.CheckBox;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "LifecycleTracker";
+    public static final String PREFS_NAME = "UserPrefs";
+    public static final String KEY_USERNAME = "username";
+    public static final String KEY_REMEMBER = "remember";
     private static final int COLOR_NORMAL = Color.parseColor("#6200EE");
     private static final int COLOR_PRESSED = Color.parseColor("#4CAF50");
 
@@ -30,10 +35,28 @@ public class MainActivity extends AppCompatActivity {
         toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         Log.d(TAG, "onCreate: Activity is being created");
 
+
         ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
         EditText editUsername = findViewById(R.id.editUsername);
+
         Button btnSave = findViewById(R.id.btnSave);
 
+        CheckBox chkRemember = findViewById(R.id.chkRemember);
+
+        SharedPreferences prefs =
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+// Load saved data
+        boolean remember = prefs.getBoolean(KEY_REMEMBER, false);
+
+        chkRemember.setChecked(remember);
+
+        if (remember) {
+            editUsername.setText(
+                    prefs.getString(KEY_USERNAME, "")
+            );
+        }
         btnSave.setBackgroundColor(COLOR_NORMAL);
 
         btnSave.setOnClickListener(v -> {
@@ -53,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT);
-            params.topToBottom = R.id.editEmail;
+            params.topToBottom = R.id.chkRemember;
             params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
             params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
             params.topMargin = 48;
@@ -66,12 +89,25 @@ public class MainActivity extends AppCompatActivity {
                 userName = "Student";
             }
 
+            SharedPreferences.Editor editor = prefs.edit();
+
+            if (chkRemember.isChecked()) {
+
+                editor.putString(KEY_USERNAME, userName);
+                editor.putBoolean(KEY_REMEMBER, true);
+
+            } else {
+
+                editor.remove(KEY_USERNAME);
+                editor.putBoolean(KEY_REMEMBER, false);
+            }
+
+            editor.apply();
+
             Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
 
             intent.putExtra("USER_NAME", userName);
             intent.putExtra("USER_AGE", 20);
-
-            startActivity(intent);
 
             startActivity(intent);
         });

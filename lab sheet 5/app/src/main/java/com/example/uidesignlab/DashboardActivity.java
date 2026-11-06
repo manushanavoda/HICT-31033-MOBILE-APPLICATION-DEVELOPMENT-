@@ -24,11 +24,14 @@ import android.net.Uri;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 public class DashboardActivity extends AppCompatActivity
         implements HeaderFragment.OnHeaderInteractionListener {
 
     private static final String TAG = "LifecycleTracker";
+    private static final String STORAGE_TAG = "StorageLab";
 
 
 
@@ -47,6 +50,26 @@ public class DashboardActivity extends AppCompatActivity
         String userName = getIntent().getStringExtra("USER_NAME");
         TextView txtUserName = findViewById(R.id.txtUserName);
         txtUserName.setText(getString(R.string.hello_user, userName));
+
+        if (savedInstanceState == null) {
+
+            SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+
+            int visits = prefs.getInt("visit_count", 0) + 1;
+
+            SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putInt("visit_count", visits);
+
+            boolean saved = editor.commit();
+
+            Log.d(STORAGE_TAG, "Visit count saved: " + saved
+                    + " (" + visits + ")");
+
+            Toast.makeText(this,
+                    getString(R.string.visit_count, visits),
+                    Toast.LENGTH_SHORT).show();
+        }
 
         int age = getIntent().getIntExtra("USER_AGE", 0);
 
@@ -152,7 +175,17 @@ public class DashboardActivity extends AppCompatActivity
 
                     .setMessage("Are you sure you want to log out?")
 
-                    .setPositiveButton("Yes", (dialog, which) -> finish())
+                    .setPositiveButton("Yes", (dialog, which) -> {
+
+                        getSharedPreferences(
+                                MainActivity.PREFS_NAME,
+                                MODE_PRIVATE
+                        )
+                                .edit()
+                                .clear()
+                                .apply();
+                                finish();
+                    })
 
                     .setNegativeButton("No", null)
 
