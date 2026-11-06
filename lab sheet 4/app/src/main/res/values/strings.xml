@@ -18,5 +18,6 @@
 
     <string name="menu_swap">Swap Fragment</string>
     <string name="send_to_detail">Send to Detail</string>
+    <string name="clear_detail">Clear</string>
 
 </resources>

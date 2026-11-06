@@ -14,10 +14,16 @@ import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(String item);
+    }
     private final List<String> items;
 
-    public MyAdapter(List<String> items) {
+    private final OnItemClickListener listener;
+
+    public MyAdapter(List<String> items, OnItemClickListener listener) {
         this.items = items;
+        this.listener = listener;
     }
 
     // ViewHolder: Holds the views of one row
@@ -50,11 +56,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.txtItem.setText(item);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(
-                    v.getContext(),
-                    item,
-                    Toast.LENGTH_SHORT
-            ).show();
+            if (listener != null) {
+                listener.onItemClick(item);
+            }
         });
     }
 

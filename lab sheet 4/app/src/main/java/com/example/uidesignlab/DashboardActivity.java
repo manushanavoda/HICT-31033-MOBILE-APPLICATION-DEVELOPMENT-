@@ -82,7 +82,9 @@ public class DashboardActivity extends AppCompatActivity
         items.add("EditText");
 
 // Create Adapter
-        MyAdapter myAdapter = new MyAdapter(items);
+        MyAdapter myAdapter = new MyAdapter(items, item -> {
+            updateDetail(item);
+        });
 
 // Connect Adapter to RecyclerView
         recyclerView.setAdapter(myAdapter);
@@ -190,7 +192,7 @@ public class DashboardActivity extends AppCompatActivity
                     new DetailFragment()
             );
         }
-
+        transaction.addToBackStack(null);
         transaction.commit();
 
         return true;
@@ -208,6 +210,12 @@ public class DashboardActivity extends AppCompatActivity
         // and pass it to DetailFragment
 
         updateDetail(data);
+    }
+    @Override
+    public void onClearButtonClicked() {
+
+        updateDetail(getString(R.string.detail_default));
+
     }
 
 

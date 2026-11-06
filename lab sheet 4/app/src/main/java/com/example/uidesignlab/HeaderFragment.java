@@ -21,6 +21,8 @@ public class HeaderFragment extends Fragment {
 
         void onButtonClicked(String data);
 
+        void onClearButtonClicked();
+
     }
 
     private OnHeaderInteractionListener mListener;
@@ -67,6 +69,11 @@ public class HeaderFragment extends Fragment {
 
         btnHeader.setOnClickListener(v ->
                 mListener.onButtonClicked("Hello from Header!")
+        );
+        Button btnClear = view.findViewById(R.id.btnClear);
+
+        btnClear.setOnClickListener(v ->
+                mListener.onClearButtonClicked()
         );
 
         return view;
