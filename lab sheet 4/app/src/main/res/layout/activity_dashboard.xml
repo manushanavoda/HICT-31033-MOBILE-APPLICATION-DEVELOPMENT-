@@ -16,18 +16,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/txtWelcome"
-        android:layout_width="wrap_content"
+    <androidx.fragment.app.FragmentContainerView
+
+        android:id="@+id/header_container"
+
+        android:name="com.example.uidesignlab.HeaderFragment"
+
+        android:layout_width="0dp"
+
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/welcome_message"
-        android:textColor="@color/my_custom_color"
-        android:textSize="22sp"
-        android:textStyle="bold"
+
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="parent" />
+
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/txtUserName"
@@ -36,7 +39,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/txtWelcome"
+        app:layout_constraintTop_toBottomOf="@id/header_container"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
