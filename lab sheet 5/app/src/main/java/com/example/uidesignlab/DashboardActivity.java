@@ -159,13 +159,10 @@ public class DashboardActivity extends AppCompatActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-
-            Toast.makeText(this,
-                    "Settings clicked",
-                    Toast.LENGTH_SHORT).show();
-
+        if (id == R.id.action_notes) {
+            startActivity(new Intent(this, NotesActivity.class));
             return true;
+
 
         } else if (id == R.id.action_logout) {
 
