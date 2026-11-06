@@ -22,8 +22,11 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.Button;
+import android.widget.Toast;
+import androidx.fragment.app.Fragment;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity
+        implements HeaderFragment.OnHeaderInteractionListener {
 
     private static final String TAG = "LifecycleTracker";
 
@@ -194,6 +197,37 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
         return super.onOptionsItemSelected(item);
+
+
+
+    }
+    @Override
+    public void onButtonClicked(String data) {
+
+        // Receive data from HeaderFragment
+        // and pass it to DetailFragment
+
+        updateDetail(data);
+    }
+
+
+    private void updateDetail(String text) {
+
+        Fragment current = getSupportFragmentManager()
+                .findFragmentById(R.id.dynamic_fragment_container);
+
+        if (current instanceof DetailFragment) {
+
+            ((DetailFragment) current).updateTextView(text);
+
+        } else {
+
+            Toast.makeText(
+                    this,
+                    "Detail area is not showing",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
     }
 
 

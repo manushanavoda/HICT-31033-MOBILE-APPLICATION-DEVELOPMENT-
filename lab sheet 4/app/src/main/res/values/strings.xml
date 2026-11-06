@@ -17,5 +17,6 @@
     <string name="info_text">This is the Info Fragment. It replaced the Detail Fragment.</string>
 
     <string name="menu_swap">Swap Fragment</string>
+    <string name="send_to_detail">Send to Detail</string>
 
 </resources>
