@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">UIDesignLab</string>
+
+    <string name="welcome_message">Welcome to My Dashboard</string>
+    <string name="profile_title">Profile Setup</string>
+    <string name="username_hint">Username</string>
+    <string name="save_button">Save Profile</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="hello_user">Hello, %1$s!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_logout">Logout</string>
+    <string name="visit_website">Visit Website</string>
+    <string name="menu_about">About</string>
+
+</resources>
