@@ -27,4 +27,8 @@
         android:title="@string/menu_notes"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_users"
+        android:title="@string/menu_users" />
+
 </menu>
