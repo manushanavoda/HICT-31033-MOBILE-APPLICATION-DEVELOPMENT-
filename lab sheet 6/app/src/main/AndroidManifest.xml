@@ -29,6 +29,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <provider
+            android:name=".UserProvider"
+            android:authorities="com.example.uidesignlab.provider"
+            android:exported="false" />
+
     </application>
 
 </manifest>

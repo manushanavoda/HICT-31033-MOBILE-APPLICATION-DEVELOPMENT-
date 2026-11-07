@@ -19,6 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import android.database.Cursor;
+import android.net.Uri;
+import android.widget.TextView;
 
 public class UsersActivity extends AppCompatActivity {
 
@@ -205,6 +208,53 @@ public class UsersActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         loadUsers();
+
+        readUsersFromProvider();
     }
+
+    private void readUsersFromProvider() {
+
+        AppDatabase.databaseExecutor.execute(() -> {
+
+            Uri uri = UserProvider.CONTENT_URI;
+
+            try (Cursor cursor = getContentResolver().query(
+                    uri,
+                    null,
+                    null,
+                    null,
+                    "id DESC"
+            )) {
+
+                if (cursor != null) {
+
+                    while (cursor.moveToNext()) {
+
+                        int id = cursor.getInt(
+                                cursor.getColumnIndexOrThrow("id")
+                        );
+
+                        String name = cursor.getString(
+                                cursor.getColumnIndexOrThrow("name")
+                        );
+
+                        Log.d("ContentProvider",
+                                "ID: " + id + ", Name: " + name);
+                    }
+
+                    Log.d("ContentProvider",
+                            "Users read successfully");
+
+                }
+
+            } catch (Exception e) {
+
+                Log.e("ContentProvider",
+                        "Error reading users", e);
+            }
+        });
+    }
+
 }
