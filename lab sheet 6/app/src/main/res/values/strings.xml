@@ -32,5 +32,13 @@
     <string name="menu_notes">My Notes</string>
     <string name="append_note">Append</string>
 
+    <string name="users_title">Saved Users</string>
+    <string name="add_john">Add John</string>
+    <string name="clear_all">Clear All</string>
+    <string name="read_provider">Read Provider</string>
+    <string name="menu_users">Saved Users</string>
+
+
+
 
 </resources>
