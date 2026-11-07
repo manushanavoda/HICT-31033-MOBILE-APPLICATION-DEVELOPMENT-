@@ -113,6 +113,18 @@ public class MainActivity extends AppCompatActivity {
             Log.d("StorageLab",
                     "UserPrefs commit result: " + result);
 
+            final String nameToSave = userName;
+
+            AppDatabase.databaseExecutor.execute(() -> {
+
+                long newId = AppDatabase.getInstance(getApplicationContext())
+                        .userDao()
+                        .insert(new UserRecord(nameToSave));
+
+                Log.d("RoomLab", "Inserted " + nameToSave + ", id = " + newId);
+
+            });
+
             Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
 
             intent.putExtra("USER_NAME", userName);
