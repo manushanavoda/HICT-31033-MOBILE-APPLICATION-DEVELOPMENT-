@@ -41,7 +41,19 @@ public class UsersActivity extends AppCompatActivity {
                 new LinearLayoutManager(this)
         );
 
-        userAdapter = new UserAdapter();
+        userAdapter = new UserAdapter(user -> {
+
+            AppDatabase.databaseExecutor.execute(() -> {
+
+                AppDatabase.getInstance(getApplicationContext())
+                        .userDao()
+                        .delete(user);
+
+                runOnUiThread(this::loadUsers);
+
+            });
+
+        });
         recyclerViewUsers.setAdapter(userAdapter);
 
         // Add John
@@ -97,6 +109,7 @@ public class UsersActivity extends AppCompatActivity {
     }
 
     // Load database users
+
     private void loadUsers() {
 
         AppDatabase.databaseExecutor.execute(() -> {
@@ -113,6 +126,7 @@ public class UsersActivity extends AppCompatActivity {
             Log.d("RoomLab", "Users loaded: " + users.size());
         });
     }
+
 
     // Read Android Contacts Provider
     private void readContacts() {

@@ -42,4 +42,9 @@ public interface UserDao {
     // Delete user by ID
     @Query("DELETE FROM UserRecord WHERE id = :id")
     int deleteById(long id);
+
+    // Count users with the same name
+    @Query("SELECT COUNT(*) FROM UserRecord WHERE name = :name")
+    int countByName(String name);
+
 }

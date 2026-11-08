@@ -5,7 +5,11 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class UserProvider extends ContentProvider {
 
@@ -42,33 +46,31 @@ public class UserProvider extends ContentProvider {
         return true;
     }
 
+    @Nullable
     @Override
     public Cursor query(
-            Uri uri,
-            String[] projection,
-            String selection,
-            String[] selectionArgs,
-            String sortOrder
-    ) {
+            @NonNull Uri uri,
+            @Nullable String[] projection,
+            @Nullable String selection,
+            @Nullable String[] selectionArgs,
+            @Nullable String sortOrder) {
 
-        if (uriMatcher.match(uri) != USERS &&
-                uriMatcher.match(uri) != USER_ID) {
+        int match = uriMatcher.match(uri);
+
+        if (match != USERS && match != USER_ID) {
             throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        String table = "UserRecord";
+        StringBuilder sql = new StringBuilder(
+                "SELECT * FROM UserRecord"
+        );
 
-        if (uriMatcher.match(uri) == USER_ID) {
+        if (match == USER_ID) {
             selection = "id = ?";
             selectionArgs = new String[]{
                     uri.getLastPathSegment()
             };
         }
-
-
-        StringBuilder sql = new StringBuilder(
-                "SELECT * FROM UserRecord"
-        );
 
         if (selection != null && !selection.trim().isEmpty()) {
             sql.append(" WHERE ").append(selection);
@@ -78,23 +80,18 @@ public class UserProvider extends ContentProvider {
             sql.append(" ORDER BY ").append(sortOrder);
         }
 
-        String[] args = selectionArgs;
-
-        if (args == null) {
-            args = new String[0];
-        }
+        String[] args = selectionArgs != null
+                ? selectionArgs
+                : new String[0];
 
         return database.getOpenHelper()
                 .getReadableDatabase()
-                .query(
-                        sql.toString(),
-                        args
-                );
-
+                .query(sql.toString(), args);
     }
 
+    @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
 
         int match = uriMatcher.match(uri);
 
@@ -111,23 +108,98 @@ public class UserProvider extends ContentProvider {
         throw new IllegalArgumentException("Unknown URI: " + uri);
     }
 
+    @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        throw new UnsupportedOperationException("Insert not supported");
-    }
+    public Uri insert(
+            @NonNull Uri uri,
+            @Nullable ContentValues values) {
 
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        throw new UnsupportedOperationException("Delete not supported");
+        if (uriMatcher.match(uri) != USERS) {
+            throw new IllegalArgumentException("Invalid URI: " + uri);
+        }
+
+        if (values == null) {
+            throw new IllegalArgumentException("Values cannot be null");
+        }
+
+        long id = database.getOpenHelper()
+                .getWritableDatabase()
+                .insert(
+                        "UserRecord",
+                        SQLiteDatabase.CONFLICT_ABORT,
+                        values
+                );
+
+        if (id == -1) {
+            return null;
+        }
+
+        return Uri.withAppendedPath(
+                CONTENT_URI,
+                String.valueOf(id)
+        );
     }
 
     @Override
     public int update(
-            Uri uri,
-            ContentValues values,
-            String selection,
-            String[] selectionArgs
-    ) {
-        throw new UnsupportedOperationException("Update not supported");
+            @NonNull Uri uri,
+            @Nullable ContentValues values,
+            @Nullable String selection,
+            @Nullable String[] selectionArgs) {
+
+        int match = uriMatcher.match(uri);
+
+        if (match != USERS && match != USER_ID) {
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
+        if (values == null) {
+            return 0;
+        }
+
+        if (match == USER_ID) {
+            selection = "id = ?";
+            selectionArgs = new String[]{
+                    uri.getLastPathSegment()
+            };
+        }
+
+        return database.getOpenHelper()
+                .getWritableDatabase()
+                .update(
+                        "UserRecord",
+                        SQLiteDatabase.CONFLICT_ABORT,
+                        values,
+                        selection,
+                        selectionArgs
+                );
+    }
+
+    @Override
+    public int delete(
+            @NonNull Uri uri,
+            @Nullable String selection,
+            @Nullable String[] selectionArgs) {
+
+        int match = uriMatcher.match(uri);
+
+        if (match != USERS && match != USER_ID) {
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
+        if (match == USER_ID) {
+            selection = "id = ?";
+            selectionArgs = new String[]{
+                    uri.getLastPathSegment()
+            };
+        }
+
+        return database.getOpenHelper()
+                .getWritableDatabase()
+                .delete(
+                        "UserRecord",
+                        selection,
+                        selectionArgs
+                );
     }
 }

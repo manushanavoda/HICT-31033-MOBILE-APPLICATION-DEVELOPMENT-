@@ -117,11 +117,24 @@ public class MainActivity extends AppCompatActivity {
 
             AppDatabase.databaseExecutor.execute(() -> {
 
-                long newId = AppDatabase.getInstance(getApplicationContext())
-                        .userDao()
-                        .insert(new UserRecord(nameToSave));
+                UserDao dao = AppDatabase.getInstance(getApplicationContext())
+                        .userDao();
 
-                Log.d("RoomLab", "Inserted " + nameToSave + ", id = " + newId);
+                int count = dao.countByName(nameToSave);
+
+                if (count == 0) {
+
+                    long newId = dao.insert(new UserRecord(nameToSave));
+
+                    Log.d("RoomLab",
+                            "Inserted " + nameToSave + ", id = " + newId);
+
+                } else {
+
+                    Log.d("RoomLab",
+                            "Duplicate name found: " + nameToSave + ". Not inserted.");
+
+                }
 
             });
 

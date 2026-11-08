@@ -1,3 +1,4 @@
+
 package com.example.uidesignlab;
 
 import android.view.LayoutInflater;
@@ -15,8 +16,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private List<UserRecord> users = new ArrayList<>();
 
+    // Interface for click listener
+    public interface OnUserClickListener {
+        void onUserClick(UserRecord user);
+    }
+
+    private OnUserClickListener listener;
+
+    public UserAdapter(OnUserClickListener listener) {
+        this.listener = listener;
+    }
+
     public void setUsers(List<UserRecord> newUsers) {
-        users = newUsers;
+        users = new ArrayList<>(newUsers);
         notifyDataSetChanged();
     }
 
@@ -33,7 +45,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     @NonNull
     @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserViewHolder onCreateViewHolder(
+            @NonNull ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item, parent, false);
@@ -42,11 +55,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(
+            @NonNull UserViewHolder holder, int position) {
 
         UserRecord user = users.get(position);
 
         holder.txtItem.setText(user.id + ". " + user.name);
+
+        // Delete user when row is clicked
+        holder.itemView.setOnClickListener(v -> {
+
+            if (listener != null) {
+                listener.onUserClick(user);
+            }
+
+        });
     }
 
     @Override
