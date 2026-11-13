@@ -51,6 +51,7 @@ public class DashboardActivity extends AppCompatActivity
         }
 
         TextView txtUserName = findViewById(R.id.txtUserName);
+
         txtUserName.setText(
                 getString(R.string.hello_user, userName)
         );
@@ -257,6 +258,18 @@ public class DashboardActivity extends AppCompatActivity
             Intent intent = new Intent(
                     DashboardActivity.this,
                     UsersActivity.class
+            );
+
+            startActivity(intent);
+
+            return true;
+
+        } else if (id == R.id.action_cloud) {
+
+            // Open Firebase Cloud Users screen
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    CloudActivity.class
             );
 
             startActivity(intent);

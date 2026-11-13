@@ -39,6 +39,14 @@
     <string name="menu_users">Saved Users</string>
 
 
-
+    <string name="cloud_title">Cloud Users</string>
+    <string name="hint_user_id">User ID (for example u1)</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_role">Role</string>
+    <string name="save_user">Save</string>
+    <string name="update_role">Update Role</string>
+    <string name="delete_user">Delete</string>
+    <string name="no_users">No users in the cloud yet</string>
+    <string name="menu_cloud">Cloud Users</string>
 
 </resources>
