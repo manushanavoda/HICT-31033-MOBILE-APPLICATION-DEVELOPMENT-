@@ -49,6 +49,12 @@ public class CloudActivity extends AppCompatActivity {
         // Save button
         btnSaveUser.setOnClickListener(v -> saveUser());
 
+        // Update button
+        btnUpdateRole.setOnClickListener(v -> updateUserRole());
+
+        // Delete button
+        btnDeleteUser.setOnClickListener(v -> deleteUser());
+
         // Set initial text
         txtCloudData.setText(getString(R.string.no_users));
 
@@ -56,8 +62,7 @@ public class CloudActivity extends AppCompatActivity {
         usersListener = new ValueEventListener() {
 
             @Override
-            public void onDataChange(
-                    @NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 StringBuilder data = new StringBuilder();
 
@@ -89,8 +94,7 @@ public class CloudActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(
-                    @NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
 
                 Log.w("CloudLab",
                         "Failed to read data",
@@ -119,21 +123,14 @@ public class CloudActivity extends AppCompatActivity {
                 .removeEventListener(usersListener);
     }
 
+    // Save User
     private void saveUser() {
 
-        String userId = editUserId.getText()
-                .toString().trim();
+        String userId = editUserId.getText().toString().trim();
+        String name = editName.getText().toString().trim();
+        String role = editRole.getText().toString().trim();
 
-        String name = editName.getText()
-                .toString().trim();
-
-        String role = editRole.getText()
-                .toString().trim();
-
-        // Check empty fields
-        if (userId.isEmpty() ||
-                name.isEmpty() ||
-                role.isEmpty()) {
+        if (userId.isEmpty() || name.isEmpty() || role.isEmpty()) {
 
             Toast.makeText(this,
                     "Please fill all fields",
@@ -142,10 +139,8 @@ public class CloudActivity extends AppCompatActivity {
             return;
         }
 
-        // Create User object
         User newUser = new User(name, role);
 
-        // Save to Firebase
         databaseReference.child("users")
                 .child(userId)
                 .setValue(newUser)
@@ -161,11 +156,78 @@ public class CloudActivity extends AppCompatActivity {
 
                 .addOnFailureListener(e -> {
 
-                    Log.w("CloudLab",
-                            "Save failed", e);
+                    Log.w("CloudLab", "Save failed", e);
 
                     Toast.makeText(this,
                             "Save failed: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+
+    // Update User Role
+    private void updateUserRole() {
+
+        String userId = editUserId.getText().toString().trim();
+        String newRole = editRole.getText().toString().trim();
+
+        if (userId.isEmpty() || newRole.isEmpty()) {
+
+            Toast.makeText(this,
+                    "Enter User ID and New Role",
+                    Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+        databaseReference.child("users")
+                .child(userId)
+                .child("role")
+                .setValue(newRole)
+
+                .addOnSuccessListener(unused -> {
+
+                    Toast.makeText(this,
+                            "User role updated successfully",
+                            Toast.LENGTH_SHORT).show();
+                })
+
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(this,
+                            "Update failed: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+
+    // Delete User
+    private void deleteUser() {
+
+        String userId = editUserId.getText().toString().trim();
+
+        if (userId.isEmpty()) {
+
+            Toast.makeText(this,
+                    "Enter User ID",
+                    Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+        databaseReference.child("users")
+                .child(userId)
+                .removeValue()
+
+                .addOnSuccessListener(unused -> {
+
+                    Toast.makeText(this,
+                            "User deleted successfully",
+                            Toast.LENGTH_SHORT).show();
+                })
+
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(this,
+                            "Delete failed: " + e.getMessage(),
                             Toast.LENGTH_LONG).show();
                 });
     }
