@@ -1,3 +1,4 @@
+
 package com.example.uidesignlab;
 
 import android.content.Intent;
@@ -13,10 +14,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
 import android.content.SharedPreferences;
 import android.widget.CheckBox;
+
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,158 +29,237 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "UserPrefs";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_REMEMBER = "remember";
-    private static final int COLOR_NORMAL = Color.parseColor("#6200EE");
-    private static final int COLOR_PRESSED = Color.parseColor("#4CAF50");
+
+    private static final int COLOR_NORMAL =
+            Color.parseColor("#6200EE");
+
+    private static final int COLOR_PRESSED =
+            Color.parseColor("#4CAF50");
 
     private ToneGenerator toneGenerator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+
+        toneGenerator = new ToneGenerator(
+                AudioManager.STREAM_MUSIC, 100);
+
         Log.d(TAG, "onCreate: Activity is being created");
 
+        ConstraintLayout mainLayout =
+                findViewById(R.id.mainLayout);
 
-        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+        EditText editUsername =
+                findViewById(R.id.editUsername);
 
-        EditText editUsername = findViewById(R.id.editUsername);
+        Button btnSave =
+                findViewById(R.id.btnSave);
 
-        Button btnSave = findViewById(R.id.btnSave);
-
-        CheckBox chkRemember = findViewById(R.id.chkRemember);
+        CheckBox chkRemember =
+                findViewById(R.id.chkRemember);
 
         SharedPreferences prefs =
                 getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-// Load saved data
-        boolean remember = prefs.getBoolean(KEY_REMEMBER, false);
+        // Load saved data
+        boolean remember =
+                prefs.getBoolean(KEY_REMEMBER, false);
 
         chkRemember.setChecked(remember);
 
         if (remember) {
 
-            String savedName = prefs.getString(KEY_USERNAME, "");
+            String savedName =
+                    prefs.getString(KEY_USERNAME, "");
 
             editUsername.setText(savedName);
 
             Toast.makeText(this,
                     "Welcome back, " + savedName + "!",
                     Toast.LENGTH_SHORT).show();
-
         }
+
         btnSave.setBackgroundColor(COLOR_NORMAL);
 
         btnSave.setOnClickListener(v -> {
 
-            String username = editUsername.getText().toString();
-            Toast.makeText(this, "Hello, " + username, Toast.LENGTH_SHORT).show();
+            String username =
+                    editUsername.getText().toString();
+
+            Toast.makeText(this,
+                    "Hello, " + username,
+                    Toast.LENGTH_SHORT).show();
+
             btnSave.setBackgroundColor(COLOR_PRESSED);
+
             new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> btnSave.setBackgroundColor(COLOR_NORMAL), 3000);
-            toneGenerator.startTone(ToneGenerator.TONE_PROP_ACK, 400);
+                    () -> btnSave.setBackgroundColor(COLOR_NORMAL),
+                    3000);
+
+            toneGenerator.startTone(
+                    ToneGenerator.TONE_PROP_ACK, 400);
+
             TextView result = new TextView(this);
+
             result.setId(View.generateViewId());
+
             result.setText("Profile Saved Successfully!");
+
             result.setTextColor(Color.parseColor("#2E7D32"));
+
             result.setTextSize(18);
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT);
+            ConstraintLayout.LayoutParams params =
+                    new ConstraintLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                            ConstraintLayout.LayoutParams.WRAP_CONTENT);
+
             params.topToBottom = R.id.chkRemember;
-            params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-            params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+
+            params.startToStart =
+                    ConstraintLayout.LayoutParams.PARENT_ID;
+
+            params.endToEnd =
+                    ConstraintLayout.LayoutParams.PARENT_ID;
+
             params.topMargin = 48;
 
             mainLayout.addView(result, params);
 
-            String userName = editUsername.getText().toString().trim();
+            String userName =
+                    editUsername.getText().toString().trim();
 
             if (userName.isEmpty()) {
                 userName = "Student";
             }
 
+            // SharedPreferences
             SharedPreferences.Editor editor = prefs.edit();
 
             if (chkRemember.isChecked()) {
 
                 editor.putString(KEY_USERNAME, userName);
+
                 editor.putBoolean(KEY_REMEMBER, true);
 
             } else {
 
                 editor.remove(KEY_USERNAME);
+
                 editor.putBoolean(KEY_REMEMBER, false);
             }
 
             boolean commitResult = editor.commit();
 
             Log.d("StorageLab",
-                    "UserPrefs commit result: " + result);
+                    "UserPrefs commit result: " + commitResult);
 
+            // Final copy of username
             final String nameToSave = userName;
 
+            // Room Database
             AppDatabase.databaseExecutor.execute(() -> {
 
-                UserDao dao = AppDatabase.getInstance(getApplicationContext())
-                        .userDao();
+                UserDao dao = AppDatabase.getInstance(
+                        getApplicationContext()).userDao();
 
                 int count = dao.countByName(nameToSave);
 
                 if (count == 0) {
 
-                    long newId = dao.insert(new UserRecord(nameToSave));
+                    long newId = dao.insert(
+                            new UserRecord(nameToSave));
 
                     Log.d("RoomLab",
-                            "Inserted " + nameToSave + ", id = " + newId);
+                            "Inserted " + nameToSave +
+                                    ", id = " + newId);
 
                 } else {
 
                     Log.d("RoomLab",
-                            "Duplicate name found: " + nameToSave + ". Not inserted.");
-
+                            "Duplicate name found: " +
+                                    nameToSave + ". Not inserted.");
                 }
-
             });
 
-            Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+            // Task 5: Save Profile to Firebase
+            FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .push()
+                    .setValue(new User(nameToSave, "Student", ""))
+
+                    .addOnSuccessListener(unused -> {
+
+                        Log.d("CloudLab",
+                                "Profile saved to Firebase: " +
+                                        nameToSave);
+                    })
+
+                    .addOnFailureListener(e -> {
+
+                        Log.e("CloudLab",
+                                "Firebase save failed", e);
+
+                        Toast.makeText(MainActivity.this,
+                                "Cloud save failed: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    });
+
+            // Open Dashboard
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    DashboardActivity.class);
 
             intent.putExtra("USER_NAME", userName);
+
             intent.putExtra("USER_AGE", 20);
 
             startActivity(intent);
         });
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart: Activity is becoming visible");
+
+        Log.d(TAG,
+                "onStart: Activity is becoming visible");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: Activity is in the foreground");
+
+        Log.d(TAG,
+                "onResume: Activity is in the foreground");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause: Activity is losing focus");
+
+        Log.d(TAG,
+                "onPause: Activity is losing focus");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop: Activity is no longer visible");
+
+        Log.d(TAG,
+                "onStop: Activity is no longer visible");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: Activity is being destroyed");
+
+        Log.d(TAG,
+                "onDestroy: Activity is being destroyed");
+
         if (toneGenerator != null) {
             toneGenerator.release();
         }

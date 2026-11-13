@@ -1,4 +1,3 @@
-
 package com.example.uidesignlab;
 
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class CloudActivity extends AppCompatActivity {
 
-    private EditText editUserId, editName, editRole;
+    private EditText editUserId, editName, editRole, editEmail;
     private Button btnSaveUser, btnUpdateRole, btnDeleteUser;
     private TextView txtCloudData;
 
@@ -35,6 +35,7 @@ public class CloudActivity extends AppCompatActivity {
         editUserId = findViewById(R.id.editUserId);
         editName = findViewById(R.id.editName);
         editRole = findViewById(R.id.editRole);
+        editEmail = findViewById(R.id.editEmail);
 
         btnSaveUser = findViewById(R.id.btnSaveUser);
         btnUpdateRole = findViewById(R.id.btnUpdateRole);
@@ -46,16 +47,13 @@ public class CloudActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance()
                 .getReference();
 
-        // Save button
+        // Button click listeners
         btnSaveUser.setOnClickListener(v -> saveUser());
 
-        // Update button
         btnUpdateRole.setOnClickListener(v -> updateUserRole());
 
-        // Delete button
         btnDeleteUser.setOnClickListener(v -> deleteUser());
 
-        // Set initial text
         txtCloudData.setText(getString(R.string.no_users));
 
         // Firebase read listener
@@ -74,12 +72,20 @@ public class CloudActivity extends AppCompatActivity {
 
                         String id = child.getKey();
 
+                        String email = user.getEmail();
+
+                        if (email == null) {
+                            email = "";
+                        }
+
                         data.append(id)
                                 .append(": ")
                                 .append(user.getName())
                                 .append(" (")
                                 .append(user.getRole())
-                                .append(")\n");
+                                .append(") - ")
+                                .append(email)
+                                .append("\n");
                     }
                 }
 
@@ -123,14 +129,14 @@ public class CloudActivity extends AppCompatActivity {
                 .removeEventListener(usersListener);
     }
 
-    // Save User
+    // Task 1 + Task 4: Save User with Email and Automatic ID
     private void saveUser() {
 
-        String userId = editUserId.getText().toString().trim();
         String name = editName.getText().toString().trim();
         String role = editRole.getText().toString().trim();
+        String email = editEmail.getText().toString().trim();
 
-        if (userId.isEmpty() || name.isEmpty() || role.isEmpty()) {
+        if (name.isEmpty() || role.isEmpty() || email.isEmpty()) {
 
             Toast.makeText(this,
                     "Please fill all fields",
@@ -139,32 +145,53 @@ public class CloudActivity extends AppCompatActivity {
             return;
         }
 
-        User newUser = new User(name, role);
+        // Generate unique Firebase ID
+        DatabaseReference usersRef =
+                databaseReference.child("users");
 
-        databaseReference.child("users")
-                .child(userId)
-                .setValue(newUser)
+        String newId = usersRef.push().getKey();
+
+        if (newId == null) {
+
+            Toast.makeText(this,
+                    "Failed to generate ID",
+                    Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+
+        // Create User object
+        User newUser = new User(name, role, email);
+
+        // Save to Firebase
+        usersRef.child(newId).setValue(newUser)
 
                 .addOnSuccessListener(unused -> {
 
                     Toast.makeText(this,
-                            "Saved to the cloud",
-                            Toast.LENGTH_SHORT).show();
+                            "Saved to cloud. ID: " + newId,
+                            Toast.LENGTH_LONG).show();
 
-                    Log.d("CloudLab", "User saved: " + userId);
+                    Log.d("CloudLab",
+                            "User saved: " + newId);
+
+                    editUserId.setText("");
+                    editName.setText("");
+                    editRole.setText("");
+                    editEmail.setText("");
                 })
 
                 .addOnFailureListener(e -> {
 
-                    Log.w("CloudLab", "Save failed", e);
-
                     Toast.makeText(this,
                             "Save failed: " + e.getMessage(),
                             Toast.LENGTH_LONG).show();
+
+                    Log.w("CloudLab", "Save failed", e);
                 });
     }
 
-    // Update User Role
+    // Task 2: Update Existing User Role
     private void updateUserRole() {
 
         String userId = editUserId.getText().toString().trim();
@@ -179,27 +206,44 @@ public class CloudActivity extends AppCompatActivity {
             return;
         }
 
-        databaseReference.child("users")
-                .child(userId)
-                .child("role")
-                .setValue(newRole)
+        DatabaseReference userRef =
+                databaseReference.child("users").child(userId);
 
-                .addOnSuccessListener(unused -> {
+        userRef.get().addOnSuccessListener(snapshot -> {
 
-                    Toast.makeText(this,
-                            "User role updated successfully",
-                            Toast.LENGTH_SHORT).show();
-                })
+            if (snapshot.exists()) {
 
-                .addOnFailureListener(e -> {
+                userRef.child("role")
+                        .setValue(newRole)
+                        .addOnSuccessListener(unused -> {
 
-                    Toast.makeText(this,
-                            "Update failed: " + e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                });
+                            Toast.makeText(this,
+                                    "User role updated successfully",
+                                    Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+
+                            Toast.makeText(this,
+                                    "Update failed: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        });
+
+            } else {
+
+                Toast.makeText(this,
+                        "User does not exist",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }).addOnFailureListener(e -> {
+
+            Toast.makeText(this,
+                    "Read failed: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        });
     }
 
-    // Delete User
+    // Task 3: Delete User with Confirmation Dialog
     private void deleteUser() {
 
         String userId = editUserId.getText().toString().trim();
@@ -213,22 +257,35 @@ public class CloudActivity extends AppCompatActivity {
             return;
         }
 
-        databaseReference.child("users")
-                .child(userId)
-                .removeValue()
+        new AlertDialog.Builder(this)
 
-                .addOnSuccessListener(unused -> {
+                .setTitle("Delete User")
 
-                    Toast.makeText(this,
-                            "User deleted successfully",
-                            Toast.LENGTH_SHORT).show();
+                .setMessage("Are you sure you want to delete this user?")
+
+                .setPositiveButton("Yes", (dialog, which) -> {
+
+                    databaseReference.child("users")
+                            .child(userId)
+                            .removeValue()
+
+                            .addOnSuccessListener(unused -> {
+
+                                Toast.makeText(this,
+                                        "User deleted successfully",
+                                        Toast.LENGTH_SHORT).show();
+                            })
+
+                            .addOnFailureListener(e -> {
+
+                                Toast.makeText(this,
+                                        "Delete failed: " + e.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            });
                 })
 
-                .addOnFailureListener(e -> {
+                .setNegativeButton("No", null)
 
-                    Toast.makeText(this,
-                            "Delete failed: " + e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                });
+                .show();
     }
 }
