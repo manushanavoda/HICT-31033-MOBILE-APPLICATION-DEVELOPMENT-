@@ -49,4 +49,6 @@
     <string name="no_users">No users in the cloud yet</string>
     <string name="menu_cloud">Cloud Users</string>
 
+    <string name="menu_background">Background Work</string>
+
 </resources>

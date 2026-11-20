@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/txtBgTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Background Work"
+        android:textColor="@color/my_custom_color"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="5"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/txtBgTitle"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Press a button to start"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/txtStatus"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btnStartHeavy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Heavy Task"/>
+
+        <Button
+            android:id="@+id/btnFreezeUi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Freeze the UI (bad example)"/>
+
+        <Button
+            android:id="@+id/btnStartService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Download Service"/>
+
+        <Button
+            android:id="@+id/btnStartLeaky"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Leaky Task"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

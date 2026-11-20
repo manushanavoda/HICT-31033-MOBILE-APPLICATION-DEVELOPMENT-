@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UIDesignLab">
         <activity
+            android:name=".BackgroundActivity"
+            android:exported="false" />
+        <activity
             android:name=".CloudActivity"
             android:exported="false" />
         <activity

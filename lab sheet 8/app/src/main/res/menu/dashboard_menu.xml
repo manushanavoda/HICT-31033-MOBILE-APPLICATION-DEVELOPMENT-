@@ -37,5 +37,10 @@
         android:title="@string/menu_cloud"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_background"
+        android:title="Background Work"
+        app:showAsAction="never" />
+
 
 </menu>

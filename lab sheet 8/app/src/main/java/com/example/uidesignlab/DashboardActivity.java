@@ -25,6 +25,9 @@ import androidx.fragment.app.FragmentTransaction;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
+import android.view.MenuItem;
+
 public class DashboardActivity extends AppCompatActivity
         implements HeaderFragment.OnHeaderInteractionListener {
 
@@ -274,6 +277,13 @@ public class DashboardActivity extends AppCompatActivity
 
             startActivity(intent);
 
+            return true;
+        }else if(id == R.id.action_background){
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    BackgroundActivity.class
+            );
+            startActivity(intent);
             return true;
         }
 
