@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.content.Intent;
+
 public class BackgroundActivity extends AppCompatActivity {
 
     private static final String TAG = "BackgroundLab";
@@ -43,6 +45,16 @@ public class BackgroundActivity extends AppCompatActivity {
         btnFreezeUi.setOnClickListener(v -> freezeTheUi());
 
         btnStartHeavy.setOnClickListener(v -> startHeavyTask());
+
+        Button btnStartService = findViewById(R.id.btnStartService);
+
+        btnStartService.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    BackgroundActivity.this,
+                    DownloadService.class
+            );
+            startService(intent);
+        });
     }
 
     private void freezeTheUi() {
