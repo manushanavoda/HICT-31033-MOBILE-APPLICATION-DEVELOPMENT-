@@ -64,11 +64,25 @@
             android:layout_height="wrap_content"
             android:text="Start Download Service"/>
 
+
+        <Button
+            android:id="@+id/btnStopService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop Download Service" />
+
+
         <Button
             android:id="@+id/btnStartLeaky"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Start Leaky Task"/>
+
+        <Button
+            android:id="@+id/btnStartSafe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Safe Task" />
 
     </LinearLayout>
 

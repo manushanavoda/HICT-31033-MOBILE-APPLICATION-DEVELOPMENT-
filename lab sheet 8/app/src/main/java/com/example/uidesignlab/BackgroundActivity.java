@@ -1,3 +1,4 @@
+
 package com.example.uidesignlab;
 
 import android.os.Bundle;
@@ -8,13 +9,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import android.content.Intent;
 
 public class BackgroundActivity extends AppCompatActivity {
 
@@ -46,15 +47,43 @@ public class BackgroundActivity extends AppCompatActivity {
 
         btnStartHeavy.setOnClickListener(v -> startHeavyTask());
 
+
         Button btnStartService = findViewById(R.id.btnStartService);
 
         btnStartService.setOnClickListener(v -> {
+
             Intent intent = new Intent(
                     BackgroundActivity.this,
                     DownloadService.class
             );
+
+            intent.putExtra("FILE_NAME", "maternal_health_report.pdf");
+
             startService(intent);
         });
+
+
+
+        Button btnStopService = findViewById(R.id.btnStopService);
+
+        btnStopService.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    BackgroundActivity.this,
+                    DownloadService.class
+            );
+
+            stopService(intent);
+        });
+
+
+
+
+        Button btnStartLeaky = findViewById(R.id.btnStartLeaky);
+        btnStartLeaky.setOnClickListener(v -> startLeakyTask());
+
+        Button btnStartSafe = findViewById(R.id.btnStartSafe);
+        btnStartSafe.setOnClickListener(v -> startSafeTask());
     }
 
     private void freezeTheUi() {
@@ -75,6 +104,8 @@ public class BackgroundActivity extends AppCompatActivity {
         Log.d(TAG, "Freeze UI completed");
     }
 
+    // TASK 1: Lambda Expressions
+
     private void startHeavyTask() {
 
         btnStartHeavy.setEnabled(false);
@@ -82,64 +113,162 @@ public class BackgroundActivity extends AppCompatActivity {
         progressBar.setProgress(0);
         progressBar.setVisibility(View.VISIBLE);
 
-        txtStatus.setText("Working...");
+        txtStatus.setText("Calculating prime numbers...");
 
-        executor.execute(new Runnable() {
+        executor.execute(() -> {
 
-            @Override
-            public void run() {
+            Log.d(TAG, "Calculation Thread: "
+                    + Thread.currentThread().getName());
 
-                Log.d(TAG, "Heavy Task Thread: "
-                        + Thread.currentThread().getName());
+            long totalPrimeSum = 0;
+            int primeCount = 0;
 
-                for (int i = 1; i <= 5; i++) {
+            int limit = 400000;
 
-                    try {
-                        Thread.sleep(1000);
+            for (int number = 2; number < limit; number++) {
 
-                    } catch (InterruptedException e) {
+                boolean isPrime = true;
 
-                        Thread.currentThread().interrupt();
-                        return;
+                for (int divisor = 2;
+                     divisor * divisor <= number;
+                     divisor++) {
+
+                    if (number % divisor == 0) {
+                        isPrime = false;
+                        break;
                     }
-
-                    final int step = i;
-
-                    mainHandler.post(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            progressBar.setProgress(step);
-
-                            txtStatus.setText(
-                                    "Progress: " + step + "/5"
-                            );
-                        }
-                    });
                 }
 
-                mainHandler.post(new Runnable() {
+                if (isPrime) {
+                    totalPrimeSum += number;
+                    primeCount++;
+                }
 
-                    @Override
-                    public void run() {
+                if (number % 10000 == 0) {
+
+                    final int progress =
+                            (number * 100) / limit;
+
+                    mainHandler.post(() -> {
+
+                        progressBar.setProgress(progress);
 
                         txtStatus.setText(
-                                "Task Completed Successfully!"
+                                "Calculating: " + progress + "%"
                         );
+                    });
+                }
+            }
 
-                        progressBar.setVisibility(View.GONE);
+            final long finalSum = totalPrimeSum;
+            final int finalCount = primeCount;
 
-                        btnStartHeavy.setEnabled(true);
-                    }
-                });
+            Log.d(TAG, "Prime Calculation Completed");
+            Log.d(TAG, "Prime Count: " + finalCount);
+            Log.d(TAG, "Prime Sum: " + finalSum);
+
+            mainHandler.post(() -> {
+
+                txtStatus.setText(
+                        "Calculation Completed!\n"
+                                + "Prime Count: " + finalCount
+                                + "\nPrime Sum: " + finalSum
+                );
+
+                progressBar.setProgress(100);
+                progressBar.setVisibility(View.GONE);
+
+                btnStartHeavy.setEnabled(true);
+            });
+        });
+    }
+
+
+    // LEAKY TASK
+    private void startLeakyTask() {
+
+        txtStatus.setText("Leaky task started");
+
+        executor.execute(() -> {
+
+            for (int i = 1; i <= 120; i++) {
+
+                try {
+                    Thread.sleep(1000);
+
+                } catch (InterruptedException e) {
+                    Log.d(TAG, "Leaky task was interrupted: stop");
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+
+                if (i % 10 == 0) {
+
+                    Log.d(TAG, "Leaky task alive, activity id = "
+                            + System.identityHashCode(
+                            BackgroundActivity.this
+                    ));
+                }
             }
         });
     }
 
+    // SAFE TASK
+    private void startSafeTask() {
+
+        txtStatus.setText("Safe task started");
+
+        SafeTask safeTask = new SafeTask(this);
+
+        executor.execute(safeTask);
+    }
+
+    // STATIC CLASS WITH WEAKREFERENCE
+    private static class SafeTask implements Runnable {
+
+        private final WeakReference<BackgroundActivity> activityRef;
+
+        SafeTask(BackgroundActivity activity) {
+            this.activityRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void run() {
+
+            for (int i = 1; i <= 120; i++) {
+
+                try {
+                    Thread.sleep(1000);
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+
+                BackgroundActivity activity = activityRef.get();
+
+                if (activity == null || activity.isDestroyed()) {
+                    Log.d(TAG, "Safe task: the screen is gone, stop work");
+                    return;
+                }
+
+                if (i % 10 == 0) {
+                    Log.d(TAG, "Safe task alive, activity id = "
+                            + System.identityHashCode(activity));
+                }
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
+
+        Log.d(TAG, "BackgroundActivity onDestroy");
+
+        executor.shutdownNow();
+
+        mainHandler.removeCallbacksAndMessages(null);
+
         super.onDestroy();
-        executor.shutdown();
     }
 }
